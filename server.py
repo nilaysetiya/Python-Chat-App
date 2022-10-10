@@ -1,5 +1,6 @@
 import socket
 import threading
+import sys
 
 host = '127.0.0.1'
 port = 42000
@@ -51,6 +52,11 @@ def receive():
         thread.start()
 
 if __name__ == '__main__':
-    receive()
+
+    try:
+        receive()
+    except KeyboardInterrupt:
+        server.close()
+        sys.exit()
 
 
