@@ -1,13 +1,18 @@
 import socket
 import threading
 import sys
+
+from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
 
 class MainScreen(QWidget):
-    def __init__(self):
+    def __init__(self, parent):
         super().__init__()
+
+        self.parent = parent
+
         self.initUI()
 
     def initUI(self):
@@ -22,10 +27,15 @@ class Login(QWidget):
         super().__init__()
 
         self.w = None
-
         self.initUI()
 
     def initUI(self):
+
+        # Main Title
+        title_label = QLabel('Login into chat app!', self)
+        title_label.setAlignment(Qt.AlignCenter)
+        title_label.setFont(QFont('Ariel', 18))
+
         # IP Address input
         ip_address_edit = QLineEdit(self)
         ip_address_edit.setAlignment(Qt.AlignCenter)
@@ -49,6 +59,7 @@ class Login(QWidget):
         connect_button.clicked.connect(self.connect_button_on_click)
 
         vbox = QVBoxLayout()
+        vbox.addWidget(title_label)
         vbox.addWidget(ip_label)
         vbox.addWidget(ip_address_edit)
         vbox.addWidget(port_label)
@@ -65,8 +76,9 @@ class Login(QWidget):
         self.show()
 
     def connect_button_on_click(self):
-        self.w = MainScreen()
+        self.w = MainScreen(self)
         self.w.show()
+        self.close()
 
 
 # # Listen to server
