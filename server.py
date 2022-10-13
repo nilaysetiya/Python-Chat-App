@@ -25,11 +25,10 @@ def new_client_added(client_name):
 
 
 def update_existing_client_list():
-    nickname = ''
-    for nickname in nicknames:
-        nickname + ':'
-
-    return nickname
+    joint_names = ''
+    for name in nicknames:
+        joint_names = joint_names + name + ':'
+    return joint_names
 
 
 # Handle messages from clients

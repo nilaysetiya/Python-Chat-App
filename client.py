@@ -108,11 +108,14 @@ def receive():
                 client.send(nickname.encode('ascii'))
             elif 'NEW_CLIENT_ADDED' in message:
                 arr = message.split(':')
+                print(arr)
                 ex.w.add_client(arr[1])
             elif 'ADD_EXISTING_CLIENTS' in message:
                 arr = message.split(':')
-                for i in range(1, len(arr)-1):
-                    ex.w.add_client(arr[i])
+                print(arr)
+                for i in range(1, len(arr)):
+                    if arr[i] != '':
+                        ex.w.add_client(arr[i])
             else:
                 print(message)
         except:
