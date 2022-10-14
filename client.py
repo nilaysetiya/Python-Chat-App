@@ -1,6 +1,7 @@
 import socket
 import threading
 import sys
+import ssl
 
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -77,9 +78,11 @@ class Login(QWidget):
     def send_one_on_one_to_server(self, msg):
         client.send(msg.encode('ascii'))
 
+    def send_create_room_to_server(self, msg):
+        client.send(msg.encode('ascii'))
+
 
 def start_server(ip_address, port_no, nick):
-
     global host
     global port
     global nickname
@@ -91,6 +94,11 @@ def start_server(ip_address, port_no, nick):
     # Connect to server
     global client
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+    context.load_cert_chain(certfile='cert.pem', keyfile='cert.pem')
+    context.load_verify_locations('cert.pem')
+    context.set_ciphers('AES128-SHA')
+    client = context.wrap_socket(client, server_hostname=host)
     client.connect((host, port))
 
     # Start receive thread
@@ -98,8 +106,8 @@ def start_server(ip_address, port_no, nick):
     receive_thread.start()
 
     # Start writing thread
-    write_thread = threading.Thread(target=write)
-    write_thread.start()
+    # write_thread = threading.Thread(target=write)
+    # write_thread.start()
 
 
 # Listen to server
@@ -123,6 +131,11 @@ def receive():
                 arr = message.split(':')
                 print(arr)
                 ex.w.one_on_one_chat.chat_box.append(arr[2] + ':' + arr[3])
+            elif 'NEW_ROOM_CREATED' in message:
+                arr = message.split(':')
+                print(arr)
+                ex.w.add_room(arr[1])
+
             else:
                 print(message)
         except:
@@ -132,10 +145,10 @@ def receive():
 
 
 # Send messages to the server
-def write():
-    while True:
-        message = f'{nickname}: {input()}'
-        client.send(message.encode('ascii'))
+# def write():
+#     while True:
+#         message = f'{nickname}: {input()}'
+#         client.send(message.encode('ascii'))
 
 
 host = ''
@@ -149,6 +162,6 @@ if __name__ == '__main__':
         app = QApplication(sys.argv)
         ex = Login()
         sys.exit(app.exec_())
-    except KeyboardInterrupt:
+    except:
         client.close()
         sys.exit(app.exec_())

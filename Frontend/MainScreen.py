@@ -4,6 +4,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from Frontend.OneOnOneChat import OneOnOneChat
+from Frontend.GroupChat import GroupChat
 
 
 class MainScreen(QWidget):
@@ -12,20 +13,24 @@ class MainScreen(QWidget):
 
         self.parent = parent
         self.one_on_one_chat = None
+        self.group_chat = None
         self.nickname = nickname
-
-        self.connected_clients_list = QListWidget()
-        self.rooms_list = QListWidget()
 
         self.initUI()
 
     def initUI(self):
+
+        self.connected_clients_list = QListWidget()
+        self.rooms_list = QListWidget()
+
         # Buttons
         one_on_one_button = QPushButton('Chat', self)
         one_on_one_button.pressed.connect(self.start_one_on_one_chat)
 
         create_room_button = QPushButton('Create Room', self)
+        create_room_button.pressed.connect(self.create_room)
         join_room_button = QPushButton('Join Room', self)
+        join_room_button.pressed.connect(self.start_room_chat)
         grid = QGridLayout()
         self.setLayout(grid)
 
@@ -55,4 +60,24 @@ class MainScreen(QWidget):
         if self.connected_clients_list.currentItem() is not None:
             self.one_on_one_chat = OneOnOneChat(self, self.nickname, self.connected_clients_list.currentItem().text())
             self.one_on_one_chat.show()
+            self.close()
+
+    def create_room(self):
+        msg = f'CREATE_ROOM:{self.nickname}'
+        self.parent.send_create_room_to_server(msg)
+
+    def add_room(self, room_name):
+        self.rooms_list.addItem(room_name)
+
+    def start_room_chat(self):
+        if self.rooms_list.currentItem() is not None:
+            list_of_clients = []
+            for i in range(self.connected_clients_list.count()):
+                list_of_clients.append(self.connected_clients_list.item(i).text())
+            self.group_chat = GroupChat(
+                self, self.nickname,
+                self.rooms_list.currentItem().text(),
+                list_of_clients
+            )
+            self.group_chat.show()
             self.close()
