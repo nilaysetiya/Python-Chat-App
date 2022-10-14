@@ -65,7 +65,7 @@ class Login(QWidget):
         self.show()
 
     def connect_button_on_click(self):
-        self.w = MainScreen(self)
+        self.w = MainScreen(self, self.nickname_edit.text())
         self.w.show()
         self.close()
         start_server(
@@ -73,6 +73,9 @@ class Login(QWidget):
             int(self.port_edit.text()),
             self.nickname_edit.text()
         )
+
+    def send_one_on_one_to_server(self, msg):
+        client.send(msg.encode('ascii'))
 
 
 def start_server(ip_address, port_no, nick):
@@ -116,6 +119,10 @@ def receive():
                 for i in range(1, len(arr)):
                     if arr[i] != '':
                         ex.w.add_client(arr[i])
+            elif 'ONE_ON_ONE' in message:
+                arr = message.split(':')
+                print(arr)
+                ex.w.one_on_one_chat.chat_box.append(arr[2] + ':' + arr[3])
             else:
                 print(message)
         except:

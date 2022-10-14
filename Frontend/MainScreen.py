@@ -3,13 +3,16 @@ import sys
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+from Frontend.OneOnOneChat import OneOnOneChat
 
 
 class MainScreen(QWidget):
-    def __init__(self, parent):
+    def __init__(self, parent, nickname):
         super().__init__()
 
         self.parent = parent
+        self.one_on_one_chat = None
+        self.nickname = nickname
 
         self.connected_clients_list = QListWidget()
         self.rooms_list = QListWidget()
@@ -19,6 +22,8 @@ class MainScreen(QWidget):
     def initUI(self):
         # Buttons
         one_on_one_button = QPushButton('Chat', self)
+        one_on_one_button.pressed.connect(self.start_one_on_one_chat)
+
         create_room_button = QPushButton('Create Room', self)
         join_room_button = QPushButton('Join Room', self)
         grid = QGridLayout()
@@ -39,9 +44,15 @@ class MainScreen(QWidget):
         grid.addWidget(create_room_button, 2, 1)
         grid.addWidget(join_room_button, 3, 1)
 
-        self.setWindowTitle('Chat Client')
+        self.setWindowTitle('Chat Client - Logged in as: ' + self.nickname)
         self.setGeometry(750, 250, 600, 750)
         self.show()
 
     def add_client(self, client_name):
         self.connected_clients_list.addItem(client_name)
+
+    def start_one_on_one_chat(self):
+        if self.connected_clients_list.currentItem() is not None:
+            self.one_on_one_chat = OneOnOneChat(self, self.nickname, self.connected_clients_list.currentItem().text())
+            self.one_on_one_chat.show()
+            self.close()

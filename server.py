@@ -35,8 +35,15 @@ def update_existing_client_list():
 def handle(client):
     while True:
         try:
-            message = client.recv(1024)
-            broadcast(message)
+            message = client.recv(1024).decode('ascii')
+
+            if 'ONE_ON_ONE' in message:
+                arr = message.split(':')
+                index = nicknames.index(arr[1])
+                temp_client = clients[index]
+                temp_client.send(message.encode('ascii'))
+                temp_client = None
+
         except:
             index = clients.index(client)
             clients.remove(client)
