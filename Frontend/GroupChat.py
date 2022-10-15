@@ -20,6 +20,7 @@ class GroupChat(QWidget):
 
     def initUI(self):
         send_button = QPushButton('Send')
+        send_button.pressed.connect(self.send_message)
         send_img_button = QPushButton('Send Image')
         close_button = QPushButton('Close')
         close_button.pressed.connect(self.back_to_main)
@@ -53,20 +54,31 @@ class GroupChat(QWidget):
         self.close()
 
     def add_user(self):
-        popup = AddClientToRoom(self, self.list_of_clients)
+        popup = AddClientToRoom(self, self.room_name, self.list_of_clients, self.nickname)
         popup.show()
 
+    def send_message(self):
+        if self.line_edit.text() is not None:
+            message = f'{self.nickname}:{self.line_edit.text()}'
+            msg = f'ROOM_MSG:{self.room_name}:{message}'
+            self.parent.parent.send_room_message_to_server(msg)
+            self.line_edit.clear()
 
 class AddClientToRoom(QDialog):
-    def __init__(self, parent, list_of_clients):
+    def __init__(self, parent, room_name, list_of_clients, nickname):
         super().__init__(parent)
+        self.parent = parent
         self.resize(400, 500)
         self.list_of_clients = list_of_clients
+        self.room_name = room_name
+        self.nickname = nickname
+        self.selected_user = None
         self.client_list = QListWidget()
         self.initUI()
 
     def initUI(self):
         add_button = QPushButton('Add', self)
+        add_button.pressed.connect(self.inv_client)
         vbox = QVBoxLayout()
 
         for client in self.list_of_clients:
@@ -78,5 +90,13 @@ class AddClientToRoom(QDialog):
         vbox.addWidget(self.client_list)
         vbox.addWidget(add_button)
         self.setLayout(vbox)
+
+    def inv_client(self):
+        if self.client_list.currentItem() is not None:
+            current_client = self.client_list.currentItem().text()
+            msg = f'ADD_CLIENT_ROOM:{self.room_name}:{current_client}:{self.nickname}'
+            # self.parent.parent.add_client_to_room(msg)
+            self.parent.parent.parent.add_client_to_room(msg)
+            self.close()
 
 

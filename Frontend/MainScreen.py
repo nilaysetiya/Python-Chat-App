@@ -81,3 +81,6 @@ class MainScreen(QWidget):
             )
             self.group_chat.show()
             self.close()
+
+    def get_group_chat(self):
+        return self.group_chat

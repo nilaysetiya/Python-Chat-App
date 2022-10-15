@@ -81,6 +81,13 @@ class Login(QWidget):
     def send_create_room_to_server(self, msg):
         client.send(msg.encode('ascii'))
 
+    def add_client_to_room(self, msg):
+        client.send(msg.encode('ascii'))
+
+    def send_room_message_to_server(self, msg):
+        print(msg)
+        client.send(msg.encode('ascii'))
+
 
 def start_server(ip_address, port_no, nick):
     global host
@@ -130,12 +137,15 @@ def receive():
             elif 'ONE_ON_ONE' in message:
                 arr = message.split(':')
                 print(arr)
-                ex.w.one_on_one_chat.chat_box.append(arr[2] + ':' + arr[3])
+                ex.w.one_on_one_chat.chat_box.append(arr[2] + ': ' + arr[3])
             elif 'NEW_ROOM_CREATED' in message:
                 arr = message.split(':')
                 print(arr)
                 ex.w.add_room(arr[1])
-
+            elif 'ROOM_MSG' in message:
+                arr = message.split(':')
+                print(arr)
+                ex.w.get_group_chat().chat_box.append(arr[2] + ': ' + arr[3])
             else:
                 print(message)
         except:

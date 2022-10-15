@@ -38,12 +38,16 @@ class Room:
         self.show_room_for_clients(self.owner, self.owner_name)
 
     def broadcast_message_to_everyone(self, msg):
+        print('room length is: ' + str(len(self.room_clients)))
         for temp_client in self.room_clients:
             temp_client.send(msg.encode('ascii'))
 
     def show_room_for_clients(self, temp_client, client_name):
         temp_client.send(f'NEW_ROOM_CREATED:{self.room_name}:{client_name}'.encode('ascii'))
 
+    def add_client(self, room_client, room_client_name):
+        self.room_clients.append(room_client)
+        self.show_room_for_clients(room_client, room_client_name)
 
 # Send message to all connected clients
 def broadcast(message):
@@ -79,6 +83,21 @@ def handle(client):
                 arr = message.split(':')
                 index = nicknames.index(arr[1])
                 rooms.append(Room(clients[index]))
+            elif 'ADD_CLIENT_ROOM' in message:
+                arr = message.split(':')
+                print(arr)
+                if arr[3] in arr[1]:
+                    room_index = room_names.index(arr[1])
+                    temp_room = rooms[room_index]
+                    index = nicknames.index(arr[2])
+                    temp_client = clients[index]
+                    temp_room.add_client(temp_client, arr[2])
+            elif 'ROOM_MSG' in message:
+                arr = message.split(':')
+                room_index = room_names.index(arr[1])
+                temp_room = rooms[room_index]
+                msg = f'ROOM_MSG:{arr[1]}:{arr[2]}:{arr[3]}'
+                temp_room.broadcast_message_to_everyone(msg)
 
         except:
             index = clients.index(client)
