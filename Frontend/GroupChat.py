@@ -17,8 +17,12 @@ class GroupChat(QWidget):
         self.line_edit = QLineEdit()
 
         self.initUI()
+        self.update_client_list()
 
     def initUI(self):
+        self.chat_box.setAcceptRichText(True)
+        self.chat_box.setOpenExternalLinks(True)
+
         send_button = QPushButton('Send')
         send_button.pressed.connect(self.send_message)
         send_img_button = QPushButton('Send Image')
@@ -64,6 +68,13 @@ class GroupChat(QWidget):
             self.parent.parent.send_room_message_to_server(msg)
             self.line_edit.clear()
 
+    def update_client_list(self):
+        print("update client list")
+        msg = f'UPDATE_ROOM_LIST:{self.room_name}'
+        print(msg)
+        self.parent.parent.send_room_message_to_server(msg)
+
+
 class AddClientToRoom(QDialog):
     def __init__(self, parent, room_name, list_of_clients, nickname):
         super().__init__(parent)
@@ -95,7 +106,6 @@ class AddClientToRoom(QDialog):
         if self.client_list.currentItem() is not None:
             current_client = self.client_list.currentItem().text()
             msg = f'ADD_CLIENT_ROOM:{self.room_name}:{current_client}:{self.nickname}'
-            # self.parent.parent.add_client_to_room(msg)
             self.parent.parent.parent.add_client_to_room(msg)
             self.close()
 

@@ -49,6 +49,16 @@ class Room:
         self.room_clients.append(room_client)
         self.show_room_for_clients(room_client, room_client_name)
 
+    def update_client_lists(self):
+        msg = f'UPDATE_ROOM_LIST:{self.room_name}:'
+        for temp_client in self.room_clients:
+            index = clients.index(temp_client)
+            name = nicknames[index]
+            msg = msg + name + ':'
+
+        for temp_client in self.room_clients:
+            temp_client.send(msg.encode('ascii'))
+
 # Send message to all connected clients
 def broadcast(message):
     for client in clients:
@@ -98,6 +108,13 @@ def handle(client):
                 temp_room = rooms[room_index]
                 msg = f'ROOM_MSG:{arr[1]}:{arr[2]}:{arr[3]}'
                 temp_room.broadcast_message_to_everyone(msg)
+            elif 'UPDATE_ROOM_LIST' in message:
+                arr = message.split(':')
+                print(arr)
+                room_index = room_names.index(arr[1])
+                temp_room = rooms[room_index]
+                temp_room.update_client_lists()
+
 
         except:
             index = clients.index(client)

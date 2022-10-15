@@ -146,6 +146,13 @@ def receive():
                 arr = message.split(':')
                 print(arr)
                 ex.w.get_group_chat().chat_box.append(arr[2] + ': ' + arr[3])
+            elif 'UPDATE_ROOM_LIST' in message:
+                arr = message.split(':')
+                print(arr)
+                ex.w.get_group_chat().client_list.clear()
+                for i in range(2, len(arr)-1):
+                    print(i)
+                    ex.w.get_group_chat().client_list.addItem(arr[i])
             else:
                 print(message)
         except:

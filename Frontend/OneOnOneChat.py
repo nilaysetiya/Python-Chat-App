@@ -19,6 +19,9 @@ class OneOnOneChat(QWidget):
         self.initUI()
 
     def initUI(self):
+        self.chat_box.setAcceptRichText(True)
+        self.chat_box.setOpenExternalLinks(True)
+
         chat_with_label = QLabel(('Chatting with ' + self.chat_with), self)
         chat_with_label.setFont(QFont('Ariel', 18))
 
