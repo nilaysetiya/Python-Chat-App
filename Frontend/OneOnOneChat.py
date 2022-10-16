@@ -71,10 +71,12 @@ class OneOnOneChat(QWidget):
         self.parent.parent.send_one_on_one_to_server(msg)
 
     def attach_file(self):
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
         file_name = QFileDialog.getOpenFileName(self, 'openfile', '')
         arr = file_name[0].split('/')
         fname = arr[-1]
-        self.chat_box.append(self.nickname + ': Sent an Image ' + fname)
+        self.chat_box.append(self.nickname + '' + current_time + ': Sent an Image ' + fname)
         msg = f'IMAGE_FROM_CLIENT:{fname}:{self.chat_with}:{self.nickname}'
         self.send_img_msg_to_client(fname)
         self.parent.parent.send_image_to_server(msg, file_name[0])
