@@ -15,7 +15,7 @@ class GroupChat(QWidget):
         self.client_list = QListWidget()
         self.chat_box = QTextBrowser()
         self.line_edit = QLineEdit()
-
+        self.images = []
         self.initUI()
         self.update_client_list()
 
@@ -110,3 +110,17 @@ class AddClientToRoom(QDialog):
             self.close()
 
 
+class ImageDialog(QDialog):
+    def __init__(self, parent, img_path):
+        super().__init__(parent)
+
+        self.img_lbl = QLabel()
+        self.img_path = img_path
+        self.load_img()
+        layout = QVBoxLayout()
+        layout.addWidget(self.img_lbl)
+        self.setLayout(layout)
+
+    def load_img(self):
+        pixmap = QPixmap(self.img_path)
+        self.img_lbl.setPixmap(QPixmap(pixmap))

@@ -85,9 +85,20 @@ class Login(QWidget):
         client.send(msg.encode('ascii'))
 
     def send_room_message_to_server(self, msg):
-        print(msg)
         client.send(msg.encode('ascii'))
 
+    def send_image_to_server(self, msg, path):
+        print(msg)
+        print(path)
+        client.send(msg.encode('ascii'))
+        send_file = open(path, 'rb')
+        output_data = send_file.read(1024)
+        while output_data:
+            client.send(output_data)
+            output_data = send_file.read(1024)
+
+        send_file.close()
+        client.send('EOF'.encode('ascii'))
 
 def start_server(ip_address, port_no, nick):
     global host
@@ -150,14 +161,27 @@ def receive():
                 arr = message.split(':')
                 print(arr)
                 ex.w.get_group_chat().client_list.clear()
-                for i in range(2, len(arr)-1):
+                for i in range(2, len(arr) - 1):
                     print(i)
                     ex.w.get_group_chat().client_list.addItem(arr[i])
+            elif 'IMAGE_FROM_SERVER' in message:
+                arr = message.split(':')
+                print(arr)
+                output_file = open(f'Received_Files/{arr[1]}', 'wb')
+                data = client.recv(1024)
+                while data:
+                    if data.isascii():
+                        break
+                    output_file.write(data)
+                    data = client.recv(1024)
+                output_file.close()
+                ex.w.one_on_one_chat.images.append(arr[1])
             else:
                 print(message)
         except:
             print("error occurred while listening to server")
             client.close()
+            sys.exit(app.exec_())
             break
 
 

@@ -114,6 +114,42 @@ def handle(client):
                 room_index = room_names.index(arr[1])
                 temp_room = rooms[room_index]
                 temp_room.update_client_lists()
+            elif 'IMAGE_FROM_CLIENT' in message:
+                arr = message.split(':')
+                print(arr)
+                output_file = open(f'Server_Files/{arr[1]}', 'wb')
+                data = client.recv(1024)
+                while data:
+                    if data.isascii():
+                        break
+                    output_file.write(data)
+                    data = client.recv(1024)
+                output_file.close()
+
+                # send to both clients
+                temp_index1 = nicknames.index(arr[2])
+                temp_index2 = nicknames.index(arr[3])
+                temp_client_1 = clients[temp_index1]
+                temp_client_2 = clients[temp_index2]
+
+                temp_client_1.send(f'IMAGE_FROM_SERVER:{arr[1]}'.encode('ascii'))
+                output_file1 = open(f'Server_Files/{arr[1]}', 'rb')
+                output_data = output_file1.read(1024)
+                while output_data:
+                    temp_client_1.send(output_data)
+                    output_data = output_file1.read(1024)
+                output_file1.close()
+                temp_client_1.send('EOF'.encode('ascii'))
+
+                temp_client_2.send(f'IMAGE_FROM_SERVER:{arr[1]}'.encode('ascii'))
+                output_file2 = open(f'Server_Files/{arr[1]}', 'rb')
+                output_data = output_file2.read(1024)
+                while output_data:
+                    temp_client_2.send(output_data)
+                    output_data = output_file2.read(1024)
+                output_file2.close()
+                temp_client_2.send('EOF'.encode('ascii'))
+
 
 
         except:
