@@ -2,6 +2,7 @@ import socket
 import threading
 import sys
 import ssl
+from datetime import datetime
 
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -146,17 +147,21 @@ def receive():
                     if arr[i] != '':
                         ex.w.add_client(arr[i])
             elif 'ONE_ON_ONE' in message:
+                now = datetime.now()
+                current_time = now.strftime("%H:%M:%S")
                 arr = message.split(':')
                 print(arr)
-                ex.w.one_on_one_chat.chat_box.append(arr[2] + ': ' + arr[3])
+                ex.w.one_on_one_chat.chat_box.append(arr[2] + ' ' + current_time + ' : ' + arr[3])
             elif 'NEW_ROOM_CREATED' in message:
                 arr = message.split(':')
                 print(arr)
                 ex.w.add_room(arr[1])
             elif 'ROOM_MSG' in message:
+                now = datetime.now()
+                current_time = now.strftime("%H:%M:%S")
                 arr = message.split(':')
                 print(arr)
-                ex.w.get_group_chat().chat_box.append(arr[2] + ': ' + arr[3])
+                ex.w.get_group_chat().chat_box.append(arr[2] + ' ' + current_time + ' : ' + arr[3])
             elif 'UPDATE_ROOM_LIST' in message:
                 arr = message.split(':')
                 print(arr)

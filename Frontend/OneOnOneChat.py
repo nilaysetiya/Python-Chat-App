@@ -1,8 +1,7 @@
-import sys
 
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
+from datetime import datetime
 
 
 class OneOnOneChat(QWidget):
@@ -56,7 +55,9 @@ class OneOnOneChat(QWidget):
 
     def send_to_client(self):
         if self.line_edit.text() is not None:
-            self.chat_box.append(self.nickname + ': ' + self.line_edit.text())
+            now = datetime.now()
+            current_time = now.strftime("%H:%M:%S")
+            self.chat_box.append(self.nickname + ' ' + current_time + ': ' + self.line_edit.text())
             msg = f'ONE_ON_ONE:{self.chat_with}:{self.nickname}: {self.line_edit.text()}'
             self.parent.parent.send_one_on_one_to_server(msg)
             self.line_edit.clear()
