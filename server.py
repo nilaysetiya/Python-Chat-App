@@ -59,6 +59,18 @@ class Room:
         for temp_client in self.room_clients:
             temp_client.send(msg.encode('ascii'))
 
+    def send_img_to_everyone(self, path):
+        for temp_client in self.room_clients:
+            temp_client.send(f'ROOM_IMG:{path}'.encode('ascii'))
+            send_file = open(f'Server_Files/{path}', 'rb')
+            data = send_file.read(1024)
+            while data:
+                temp_client.send(data)
+                data = send_file.read(1024)
+            send_file.close()
+            temp_client.send('EOF'.encode('ascii'))
+
+
 # Send message to all connected clients
 def broadcast(message):
     for client in clients:
@@ -150,7 +162,21 @@ def handle(client):
                 output_file2.close()
                 temp_client_2.send('EOF'.encode('ascii'))
 
+            elif 'ROOM_IMG' in message:
+                arr = message.split(':')
+                print(arr)
+                output_file = open(f'Server_Files/{arr[2]}', 'wb')
+                data = client.recv(1024)
+                while data:
+                    if data.isascii():
+                        break
+                    output_file.write(data)
+                    data = client.recv(1024)
+                output_file.close()
 
+                temp_room_index = room_names.index(arr[1])
+                temp_room = rooms[temp_room_index]
+                temp_room.send_img_to_everyone(arr[2])
 
         except:
             index = clients.index(client)

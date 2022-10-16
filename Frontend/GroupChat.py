@@ -25,7 +25,10 @@ class GroupChat(QWidget):
 
         send_button = QPushButton('Send')
         send_button.pressed.connect(self.send_message)
-        send_img_button = QPushButton('Send Image')
+        download_img_button = QPushButton('View and Download Image')
+        download_img_button.pressed.connect(self.show_img)
+        attach_img_button = QPushButton('Attach Image')
+        attach_img_button.pressed.connect(self.attach_file)
         close_button = QPushButton('Close')
         close_button.pressed.connect(self.back_to_main)
         invite_button = QPushButton('Invite')
@@ -36,7 +39,7 @@ class GroupChat(QWidget):
         hbox2 = QHBoxLayout()
         hbox.addWidget(self.line_edit)
         hbox.addWidget(send_button)
-        hbox.addWidget(send_img_button)
+        hbox.addWidget(invite_button)
 
         vbox = QVBoxLayout()
         hbox1.addWidget(self.chat_box, 7)
@@ -44,7 +47,8 @@ class GroupChat(QWidget):
         vbox.addLayout(hbox1)
         vbox.addLayout(hbox)
         hbox2.addWidget(close_button)
-        hbox2.addWidget(invite_button)
+        hbox2.addWidget(download_img_button)
+        hbox2.addWidget(attach_img_button)
         vbox.addLayout(hbox2)
 
         self.setLayout(vbox)
@@ -73,6 +77,20 @@ class GroupChat(QWidget):
         msg = f'UPDATE_ROOM_LIST:{self.room_name}'
         print(msg)
         self.parent.parent.send_room_message_to_server(msg)
+
+    def attach_file(self):
+        file_name = QFileDialog.getOpenFileName(self, 'openfile', '')
+        arr = file_name[0].split('/')
+        fname = arr[-1]
+        msg = f'ROOM_MSG:{self.room_name}:{self.nickname}:Sent an Image {fname}'
+        self.parent.parent.send_room_message_to_server(msg)
+        msg = f'ROOM_IMG:{self.room_name}:{fname}'
+        self.parent.parent.send_image_to_server(msg, file_name[0])
+
+    def show_img(self):
+        print(self.images[-1])
+        dlg = ImageDialog(self, f'Received_Files/{self.images[-1]}')
+        dlg.show()
 
 
 class AddClientToRoom(QDialog):

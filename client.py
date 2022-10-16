@@ -176,6 +176,18 @@ def receive():
                     data = client.recv(1024)
                 output_file.close()
                 ex.w.one_on_one_chat.images.append(arr[1])
+            elif 'ROOM_IMG' in message:
+                arr = message.split(':')
+                print(arr)
+                output_file = open(f'Received_Files/{arr[1]}', 'wb')
+                data = client.recv(1024)
+                while data:
+                    if data.isascii():
+                        break
+                    output_file.write(data)
+                    data = client.recv(1024)
+                output_file.close()
+                ex.w.get_group_chat().images.append(arr[1])
             else:
                 print(message)
         except:
